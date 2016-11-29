@@ -18,6 +18,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   config.vm.provider :virtualbox do |vb|
       #vb.gui = true
+      vb.name = "vagrant-redis-cluster"
 
       # Make sure our first network adaptor is 'connected'
       vb.customize ['modifyvm', :id, '--cableconnected1', 'on']
