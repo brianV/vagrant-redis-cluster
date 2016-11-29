@@ -5,18 +5,23 @@
 VAGRANTFILE_API_VERSION = "2"
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
+
   # ubuntu 64bit image
-  config.vm.box = "ubuntu-trusty"
-  config.vm.box_url = "https://cloud-images.ubuntu.com/vagrant/trusty/current/trusty-server-cloudimg-amd64-vagrant-disk1.box"
+  config.vm.box = "geerlingguy/ubuntu1604"
 
   # enable guest auto updates
   unless Vagrant.has_plugin?("vagrant-vbguest")
     raise 'vagrant-vbguest is not installed! run: "vagrant plugin install vagrant-vbguest"'
   end
   config.vbguest.auto_update = true
-  
+
+
   config.vm.provider :virtualbox do |vb|
       #vb.gui = true
+
+      # Make sure our first network adaptor is 'connected'
+      vb.customize ['modifyvm', :id, '--cableconnected1', 'on']
+
       # hacky fix for trouble with ipv6 and dns network timeout
       # https://github.com/mitchellh/vagrant/issues/1172
       vb.customize ["modifyvm", :id, "--natdnsproxy1", "off"]
@@ -25,6 +30,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   # install the redis server
   config.vm.provision :shell, :path => "bootstrap.sh"
+  config.vm.provision :shell, :path => "enable-supervisor.sh"
   config.vm.provision :shell, :path => "build_redis.sh"
   config.vm.provision :shell, :path => "install_redis.sh"
 
